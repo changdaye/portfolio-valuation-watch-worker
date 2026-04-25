@@ -3,7 +3,7 @@
   "name": "portfolio-valuation-watch-worker",
   "main": "src/index.ts",
   "compatibility_date": "2026-04-25",
-  "account_id": "905ebcafff7f6fb7c62a6226887da305",
+  "account_id": "6ef22eafdfaea04ccc59c7a4d85a087c",
   "workers_dev": true,
   "preview_urls": false,
   "observability": {
@@ -20,21 +20,22 @@
   "kv_namespaces": [
     {
       "binding": "RUNTIME_KV",
-      "id": "TODO_REPLACE_RUNTIME_KV_ID",
-      "preview_id": "TODO_REPLACE_RUNTIME_KV_PREVIEW_ID"
+      "id": "5edcd67649fe4fcfa57150bd7bffd4d4",
+      "preview_id": "36d58338958f4be78da99283370f05b0"
     }
   ],
   "d1_databases": [
     {
       "binding": "WATCHER_DB",
       "database_name": "portfolio-valuation-watch-worker",
-      "database_id": "TODO_REPLACE_D1_DATABASE_ID",
+      "database_id": "cdd1c1bd-9985-4fbe-9c7d-7ee6ae59f586",
       "migrations_dir": "migrations"
     }
   ],
   "vars": {
     "RUN_HOUR_LOCAL": "22",
     "RUN_MINUTE_LOCAL": "30",
+    "RUN_WEEKDAYS": "1,2,3,4,5,6",
     "MARKET_TIMEZONE": "Asia/Shanghai",
     "PERCENTILE_WINDOW_YEARS": "5",
     "LOW_PERCENTILE_THRESHOLD": "10",
