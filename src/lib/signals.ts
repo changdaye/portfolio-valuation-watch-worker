@@ -1,5 +1,6 @@
 import type { DailySignal, DailySnapshot, WatchItem, Zone } from '../types';
 import { percentileRank } from './percentile';
+import { formatDisplayNumber, formatDisplayPercent } from './value';
 
 function parseHistory(raw: string | null): number[] {
   if (!raw) return [];
@@ -22,9 +23,9 @@ function zoneFromPercentiles(percentiles: Array<number | null>, low: number, hig
 
 function extremeReason(snapshot: DailySnapshot, pePct5y: number | null, pbPct5y: number | null, pricePct5y: number | null, low: number, high: number): string | null {
   const parts: string[] = [];
-  if (snapshot.pe != null && pePct5y != null && (pePct5y <= low || pePct5y >= high)) parts.push(`PE ${snapshot.pe}（${pePct5y}%）`);
-  if (snapshot.pb != null && pbPct5y != null && (pbPct5y <= low || pbPct5y >= high)) parts.push(`PB ${snapshot.pb}（${pbPct5y}%）`);
-  if (snapshot.price != null && pricePct5y != null && (pricePct5y <= low || pricePct5y >= high)) parts.push(`价格 ${snapshot.price}（${pricePct5y}%）`);
+  if (snapshot.pe != null && pePct5y != null && (pePct5y <= low || pePct5y >= high)) parts.push(`PE ${formatDisplayNumber(snapshot.pe)}（${formatDisplayPercent(pePct5y)}%）`);
+  if (snapshot.pb != null && pbPct5y != null && (pbPct5y <= low || pbPct5y >= high)) parts.push(`PB ${formatDisplayNumber(snapshot.pb)}（${formatDisplayPercent(pbPct5y)}%）`);
+  if (snapshot.price != null && pricePct5y != null && (pricePct5y <= low || pricePct5y >= high)) parts.push(`价格 ${formatDisplayNumber(snapshot.price)}（${formatDisplayPercent(pricePct5y)}%）`);
   return parts.length ? parts.join(' / ') : null;
 }
 
@@ -51,8 +52,8 @@ export function buildSignal(item: WatchItem, snapshot: DailySnapshot, thresholds
     : zoneFromPercentiles(item.metricMode === 'valuation' ? [pePct5y, pbPct5y] : [pricePct5y], thresholds.low, thresholds.high);
   const reason = extremeReason(snapshot, pePct5y, pbPct5y, pricePct5y, thresholds.low, thresholds.high);
   const metrics = item.metricMode === 'valuation'
-    ? [`PE ${snapshot.pe ?? 'NA'} / ${pePct5y ?? 'NA'}%`, `PB ${snapshot.pb ?? 'NA'} / ${pbPct5y ?? 'NA'}%`]
-    : [`价格 ${snapshot.price ?? 'NA'} / ${pricePct5y ?? 'NA'}%`];
+    ? [`PE ${formatDisplayNumber(snapshot.pe)} / ${formatDisplayPercent(pePct5y)}%`, `PB ${formatDisplayNumber(snapshot.pb)} / ${formatDisplayPercent(pbPct5y)}%`]
+    : [`价格 ${formatDisplayNumber(snapshot.price)} / ${formatDisplayPercent(pricePct5y)}%`];
 
   return {
     watchItemId: item.id,

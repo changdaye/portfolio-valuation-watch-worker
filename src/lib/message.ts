@@ -1,5 +1,6 @@
 import { describeHoldingNames, describeHoldings } from '../holding-reference';
 import type { DailySignal, WatchItem } from '../types';
+import { formatDisplayNumber, formatDisplayPercent } from './value';
 
 export interface FeishuPostMessage {
   msg_type: 'post';
@@ -37,13 +38,13 @@ function zoneIcon(zone: DailySignal['zone']): string {
 function themeLine(item: WatchItem, signal: DailySignal): string {
   const holdings = describeHoldingNames(item.sourceHoldings);
   if (signal.metricMode === 'valuation') {
-    return `${zoneIcon(signal.zone)} ${item.displayName}｜持仓 ${holdings}｜PE ${signal.pePct5y ?? 'NA'}%｜PB ${signal.pbPct5y ?? 'NA'}%｜${zoneLabel(signal.zone)}`;
+    return `${zoneIcon(signal.zone)} ${item.displayName}｜持仓 ${holdings}｜PE ${formatDisplayPercent(signal.pePct5y)}%｜PB ${formatDisplayPercent(signal.pbPct5y)}%｜${zoneLabel(signal.zone)}`;
   }
-  return `${zoneIcon(signal.zone)} ${item.displayName}｜持仓 ${holdings}｜价格 ${signal.price ?? 'NA'}｜分位 ${signal.pricePct5y ?? 'NA'}%｜${zoneLabel(signal.zone)}`;
+  return `${zoneIcon(signal.zone)} ${item.displayName}｜持仓 ${holdings}｜价格 ${formatDisplayNumber(signal.price)}｜分位 ${formatDisplayPercent(signal.pricePct5y)}%｜${zoneLabel(signal.zone)}`;
 }
 
 function macroLine(item: WatchItem, signal: DailySignal): string {
-  return `${zoneIcon(signal.zone)} ${item.displayName}｜价格 ${signal.price ?? 'NA'}｜分位 ${signal.pricePct5y ?? 'NA'}%｜${zoneLabel(signal.zone)}`;
+  return `${zoneIcon(signal.zone)} ${item.displayName}｜价格 ${formatDisplayNumber(signal.price)}｜分位 ${formatDisplayPercent(signal.pricePct5y)}%｜${zoneLabel(signal.zone)}`;
 }
 
 function buildPost(paragraphs: Array<Array<{ tag: 'text'; text: string } | { tag: 'a'; text: string; href: string }>>): FeishuPostMessage {
