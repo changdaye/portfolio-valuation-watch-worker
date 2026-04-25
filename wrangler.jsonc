@@ -1,0 +1,46 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "portfolio-valuation-watch-worker",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-04-25",
+  "account_id": "905ebcafff7f6fb7c62a6226887da305",
+  "workers_dev": true,
+  "preview_urls": false,
+  "observability": {
+    "enabled": true
+  },
+  "triggers": {
+    "crons": [
+      "30 14 * * 1-6"
+    ]
+  },
+  "ai": {
+    "binding": "AI"
+  },
+  "kv_namespaces": [
+    {
+      "binding": "RUNTIME_KV",
+      "id": "TODO_REPLACE_RUNTIME_KV_ID",
+      "preview_id": "TODO_REPLACE_RUNTIME_KV_PREVIEW_ID"
+    }
+  ],
+  "d1_databases": [
+    {
+      "binding": "WATCHER_DB",
+      "database_name": "portfolio-valuation-watch-worker",
+      "database_id": "TODO_REPLACE_D1_DATABASE_ID",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "vars": {
+    "RUN_HOUR_LOCAL": "22",
+    "RUN_MINUTE_LOCAL": "30",
+    "MARKET_TIMEZONE": "Asia/Shanghai",
+    "PERCENTILE_WINDOW_YEARS": "5",
+    "LOW_PERCENTILE_THRESHOLD": "10",
+    "HIGH_PERCENTILE_THRESHOLD": "90",
+    "REQUEST_TIMEOUT_MS": "15000",
+    "HEARTBEAT_INTERVAL_HOURS": "24",
+    "LLM_MODEL": "@cf/meta/llama-3.1-8b-instruct"
+  }
+}
