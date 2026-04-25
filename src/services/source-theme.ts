@@ -160,10 +160,8 @@ async function fetchLeguleguHtmlTable(item: WatchItem, source: SourceLeguleguHtm
   );
 }
 
-async function fetchLeguleguAggregation(item: WatchItem, source: SourceLeguleguAggregation, config: AppConfig, tradeDate: string, now: Date): Promise<DailySnapshot> {
-  const warmed = await getLeguleguSession(config);
-  const token = leguleguToken(now, config.marketTimezone);
-  const url = `https://legulegu.com/api/get-aggregation-data/exp?token=${token}`;
+async function postLeguleguAggregation(endpoint: 'exp' | 'preview', source: SourceLeguleguAggregation, warmed: WarmLeguleguResult, config: AppConfig, token: string): Promise<any> {
+  const url = `https://legulegu.com/api/get-aggregation-data/${endpoint}?token=${token}`;
   const body = {
     requestedDataKeys: source.requestedDataKeys,
     types: source.requestedDataKeys.map(() => 'line'),
@@ -172,6 +170,7 @@ async function fetchLeguleguAggregation(item: WatchItem, source: SourceLeguleguA
     inverses: null,
     gridIndices: null,
     markLinesOfQuantile: null,
+    userAggregationChartId: source.pageUrl.match(/\/stockdata\/charts\/(\d+)/)?.[1],
   };
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), config.requestTimeoutMs);
@@ -188,28 +187,41 @@ async function fetchLeguleguAggregation(item: WatchItem, source: SourceLeguleguA
       body: JSON.stringify(body),
     });
     if (!response.ok) throw new Error(`HTTP ${response.status} for ${url}`);
-    const payload = await response.json<any>();
-    const xAxis = Array.isArray(payload.xAxis) ? payload.xAxis[0]?.data ?? [] : payload.xAxis?.data ?? [];
-    const series = Array.isArray(payload.series) ? payload.series[source.primarySeriesIndex] : undefined;
-    const history = Array.isArray(series?.data) ? series.data : [];
-    const points = xAxis.map((date: unknown, index: number) => ({ date: String(date), value: toNumber(history[index]) }));
-    const latest = [...points].reverse().find((point) => point.value != null);
-    const filtered = filterHistory(points, dateMinusYears(now, config.percentileWindowYears));
-    const seriesPayload = item.metricMode === 'valuation'
-      ? { pe: filtered }
-      : { price: filtered };
-    return snapshotFromSeries(
-      item,
-      tradeDate,
-      `legulegu:aggregation:${source.requestedDataKeys.join(',')}`,
-      latest?.date ?? tradeDate,
-      seriesPayload,
-      source.note ?? item.note,
-      payload,
-    );
+    return await response.json<any>();
   } finally {
     clearTimeout(timer);
   }
+}
+
+async function fetchLeguleguAggregation(item: WatchItem, source: SourceLeguleguAggregation, config: AppConfig, tradeDate: string, now: Date): Promise<DailySnapshot> {
+  const warmed = await getLeguleguSession(config);
+  const token = leguleguToken(now, config.marketTimezone);
+  const preferPreview = source.pageUrl.includes('/stockdata/charts/');
+  let payload: any;
+  try {
+    payload = await postLeguleguAggregation(preferPreview ? 'preview' : 'exp', source, warmed, config, token);
+  } catch (error) {
+    if (preferPreview) throw error;
+    payload = await postLeguleguAggregation('preview', source, warmed, config, token);
+  }
+  const xAxis = Array.isArray(payload.xAxis) ? payload.xAxis[0]?.data ?? [] : payload.xAxis?.data ?? [];
+  const series = Array.isArray(payload.series) ? payload.series[source.primarySeriesIndex] : undefined;
+  const history = Array.isArray(series?.data) ? series.data : [];
+  const points = xAxis.map((date: unknown, index: number) => ({ date: String(date), value: toNumber(history[index]) }));
+  const latest = [...points].reverse().find((point) => point.value != null);
+  const filtered = filterHistory(points, dateMinusYears(now, config.percentileWindowYears));
+  const seriesPayload = item.metricMode === 'valuation'
+    ? { pe: filtered }
+    : { price: filtered };
+  return snapshotFromSeries(
+    item,
+    tradeDate,
+    `legulegu:aggregation:${source.requestedDataKeys.join(',')}`,
+    latest?.date ?? tradeDate,
+    seriesPayload,
+    source.note ?? item.note,
+    payload,
+  );
 }
 
 function unavailableSnapshot(item: WatchItem, tradeDate: string, sourceKey: string, detail: string): DailySnapshot {
