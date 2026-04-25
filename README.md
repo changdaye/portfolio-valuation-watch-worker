@@ -21,6 +21,7 @@
 ## 设计文档
 
 - `docs/superpowers/specs/2026-04-25-portfolio-valuation-watch-worker-design.md`
+- `docs/superpowers/plans/2026-04-25-portfolio-valuation-watch-worker.md`
 
 ## 本地开发
 
