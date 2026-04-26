@@ -17,6 +17,8 @@ export interface Env {
   TENCENT_COS_REGION?: string;
   TENCENT_COS_BASE_URL?: string;
   WORKER_PUBLIC_BASE_URL?: string;
+  LLM_BASE_URL?: string;
+  LLM_API_KEY?: string;
   RUN_HOUR_LOCAL?: string;
   RUN_MINUTE_LOCAL?: string;
   RUN_WEEKDAYS?: string;
@@ -39,6 +41,8 @@ export interface AppConfig {
   cosRegion: string;
   cosBaseUrl: string;
   workerPublicBaseUrl: string;
+  llmBaseUrl: string;
+  llmApiKey: string;
   runHourLocal: number;
   runMinuteLocal: number;
   runWeekdays: number[];

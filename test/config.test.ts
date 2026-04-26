@@ -12,5 +12,7 @@ describe('parseConfig', () => {
     expect(config.highPercentileThreshold).toBe(90);
     expect(config.runWeekdays).toEqual([1, 2, 3, 4, 5, 6]);
     expect(config.workerPublicBaseUrl).toBe('https://portfolio-valuation-watch-worker.wanggejiancai822.workers.dev');
+    expect(config.llmBaseUrl).toBe('');
+    expect(config.llmApiKey).toBe('');
   });
 });

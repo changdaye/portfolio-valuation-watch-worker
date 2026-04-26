@@ -43,6 +43,6 @@
     "HIGH_PERCENTILE_THRESHOLD": "90",
     "REQUEST_TIMEOUT_MS": "15000",
     "HEARTBEAT_INTERVAL_HOURS": "24",
-    "LLM_MODEL": "@cf/meta/llama-3.1-8b-instruct"
+    "LLM_MODEL": "gpt-5.4"
   }
 }
