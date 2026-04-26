@@ -3,6 +3,7 @@ import { insertNotificationRun, listAllWatchItems, listEnabledWatchItems, reseed
 import { authorizeAdminRequest } from './lib/admin';
 import { buildDailyMessage, buildDailyPostMessage, buildExtremeAlertMessage, buildExtremeAlertPostMessage } from './lib/message';
 import { buildDetailedReport } from './lib/report';
+import { buildDetailedReportPublicUrl, maybeHandleDetailedReportRequest, saveDetailedReportCopy } from './lib/report-storage';
 import { getRuntimeState, nextRuntimeState, recordFailure, setRuntimeState, shouldSendExtremeAlert } from './lib/runtime';
 import { formatDateInZone, isoNow, weekdayInZone } from './lib/time';
 import { uploadDetailedReportToCos } from './services/cos';
@@ -98,7 +99,8 @@ export async function runDailyDigest(env: Env, now = new Date()): Promise<RunRes
   });
   try {
     const uploaded = await uploadDetailedReportToCos(config, report, now);
-    reportUrl = uploaded.url;
+    await saveDetailedReportCopy(env.RUNTIME_KV!, uploaded.key, report);
+    reportUrl = buildDetailedReportPublicUrl(config.workerPublicBaseUrl, uploaded.key);
   } catch {
     reportUrl = undefined;
   }
@@ -152,6 +154,11 @@ export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
     const config = parseConfig(env);
+
+    if (request.method === 'GET' && env.RUNTIME_KV) {
+      const reportResponse = await maybeHandleDetailedReportRequest(request, env.RUNTIME_KV);
+      if (reportResponse) return reportResponse;
+    }
 
     if (request.method === 'GET' && (url.pathname === '/' || url.pathname === '/health')) {
       return json({

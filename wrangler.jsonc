@@ -3,7 +3,7 @@
   "name": "portfolio-valuation-watch-worker",
   "main": "src/index.ts",
   "compatibility_date": "2026-04-25",
-  "account_id": "6ef22eafdfaea04ccc59c7a4d85a087c",
+  "account_id": "905ebcafff7f6fb7c62a6226887da305",
   "workers_dev": true,
   "preview_urls": false,
   "observability": {
@@ -20,15 +20,15 @@
   "kv_namespaces": [
     {
       "binding": "RUNTIME_KV",
-      "id": "5edcd67649fe4fcfa57150bd7bffd4d4",
-      "preview_id": "36d58338958f4be78da99283370f05b0"
+      "id": "4f410000a50044eb9f48be261b3dce3e",
+      "preview_id": "273f01a841f34e7f8a3bc66863a8be00"
     }
   ],
   "d1_databases": [
     {
       "binding": "WATCHER_DB",
       "database_name": "portfolio-valuation-watch-worker",
-      "database_id": "cdd1c1bd-9985-4fbe-9c7d-7ee6ae59f586",
+      "database_id": "4938d3bd-da29-4aa7-ae13-16908a463a4b",
       "migrations_dir": "migrations"
     }
   ],
