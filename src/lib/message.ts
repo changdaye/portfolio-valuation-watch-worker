@@ -96,7 +96,10 @@ export function buildDailyPostMessage(headline: string, themeRows: Array<{ item:
   for (const { item, signal } of macroRows) paragraphs.push([{ tag: 'text', text: macroLine(item, signal) }]);
   paragraphs.push([{ tag: 'text', text: '【关注代码】' }]);
   paragraphs.push([{ tag: 'text', text: focusCodes.length ? focusCodes.join(' / ') : '无新增极端项目' }]);
-  if (reportUrl) paragraphs.push([{ tag: 'text', text: '详细版报告：' }, { tag: 'a', text: '点击查看 HTML 详细报告', href: reportUrl }]);
+  if (reportUrl) {
+    paragraphs.push([{ tag: 'text', text: '详细版报告：' }]);
+    paragraphs.push([{ tag: 'text', text: reportUrl }]);
+  }
   return buildPost(paragraphs);
 }
 
@@ -122,6 +125,9 @@ export function buildExtremeAlertPostMessage(item: WatchItem, signal: DailySigna
   paragraphs.push([{ tag: 'text', text: `当前状态：${zoneLabel(signal.zone)}` }]);
   paragraphs.push([{ tag: 'text', text: `触发原因：${signal.extremeReason ?? '达到阈值'}` }]);
   paragraphs.push([{ tag: 'text', text: `关注代码：${signal.focusCodesText}` }]);
-  if (reportUrl) paragraphs.push([{ tag: 'text', text: '详细版报告：' }, { tag: 'a', text: '点击查看 HTML 详细报告', href: reportUrl }]);
+  if (reportUrl) {
+    paragraphs.push([{ tag: 'text', text: '详细版报告：' }]);
+    paragraphs.push([{ tag: 'text', text: reportUrl }]);
+  }
   return buildPost(paragraphs);
 }

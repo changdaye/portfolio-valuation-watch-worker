@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildDailyMessage, buildExtremeAlertMessage } from '../src/lib/message';
+import { buildDailyMessage, buildDailyPostMessage, buildExtremeAlertMessage, buildExtremeAlertPostMessage } from '../src/lib/message';
 import type { DailySignal, WatchItem } from '../src/types';
 
 const item: WatchItem = {
@@ -49,5 +49,15 @@ describe('message builders', () => {
     expect(text).toContain('【港股宽基 进入极端区间】');
     expect(text).toContain('关联持仓：恒生ETF华夏(159920)');
     expect(text).toContain('PE 12.2');
+  });
+
+  it('shows the full report URL in post messages without wrapping it behind custom link text', () => {
+    const dailyPost = buildDailyPostMessage('组合估值整体偏低。', [{ item, signal }], [], 'https://example.com/report.md');
+    const alertPost = buildExtremeAlertPostMessage(item, signal, 'https://example.com/report.md');
+
+    expect(JSON.stringify(dailyPost)).toContain('https://example.com/report.md');
+    expect(JSON.stringify(alertPost)).toContain('https://example.com/report.md');
+    expect(JSON.stringify(dailyPost)).not.toContain('点击查看 HTML 详细报告');
+    expect(JSON.stringify(alertPost)).not.toContain('点击查看 HTML 详细报告');
   });
 });

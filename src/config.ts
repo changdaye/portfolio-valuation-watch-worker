@@ -29,7 +29,7 @@ export function parseConfig(env: Partial<Env>): AppConfig {
     cosRegion: region,
     cosBaseUrl: env.TENCENT_COS_BASE_URL?.trim() || (bucket && region ? `https://${bucket}.cos.${region}.myqcloud.com` : ''),
 
-    workerPublicBaseUrl: env.WORKER_PUBLIC_BASE_URL?.trim() || "https://portfolio-valuation-watch-worker.qingjiaowochangdaye.workers.dev",
+    workerPublicBaseUrl: env.WORKER_PUBLIC_BASE_URL?.trim() || 'https://portfolio-valuation-watch-worker.wanggejiancai822.workers.dev',
     runHourLocal: toInt(env.RUN_HOUR_LOCAL, 22, 0),
     runMinuteLocal: toInt(env.RUN_MINUTE_LOCAL, 30, 0),
     runWeekdays: toWeekdays(env.RUN_WEEKDAYS),
