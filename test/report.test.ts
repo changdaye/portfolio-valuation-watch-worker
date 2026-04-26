@@ -38,12 +38,14 @@ describe('buildDetailedReport', () => {
       generatedAt: new Date('2026-04-25T14:30:00.000Z'),
       tradeDate: '2026-04-25',
       headline: '原油高位，组合整体偏中性。',
+      modelLabel: 'GPT 5.4 (xhigh)',
       themeRows: [],
       macroRows: [{ item, signal }],
       reportUrl: 'https://example.com/report.md',
     });
 
     expect(report).toContain('<!doctype html>');
+    expect(report).toContain('模型：</strong>GPT 5.4 (xhigh)');
     expect(report).toContain('WTI 原油');
     expect(report).toContain('关联持仓');
     expect(report).toContain('<table>');

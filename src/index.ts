@@ -97,6 +97,7 @@ export async function runDailyDigest(env: Env, now = new Date()): Promise<RunRes
     generatedAt: now,
     tradeDate,
     headline,
+    modelLabel,
     themeRows,
     macroRows,
   });

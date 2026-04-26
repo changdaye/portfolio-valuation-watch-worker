@@ -48,6 +48,7 @@ export function buildDetailedReport(input: {
   generatedAt: Date;
   tradeDate: string;
   headline: string;
+  modelLabel?: string;
   themeRows: Array<{ item: WatchItem; signal: DailySignal }>;
   macroRows: Array<{ item: WatchItem; signal: DailySignal }>;
   reportUrl?: string;
@@ -86,6 +87,7 @@ export function buildDetailedReport(input: {
       <div class="meta">
         <div><strong>交易日期：</strong>${escapeHtml(input.tradeDate)}</div>
         <div><strong>生成时间：</strong>${escapeHtml(input.generatedAt.toISOString())}</div>
+        ${input.modelLabel ? `<div><strong>模型：</strong>${escapeHtml(input.modelLabel)}</div>` : ''}
         ${input.reportUrl ? `<div><strong>报告链接：</strong><a href="${escapeHtml(input.reportUrl)}">打开当前 HTML 报告</a></div>` : ''}
       </div>
     </section>
