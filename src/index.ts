@@ -83,8 +83,11 @@ export async function runDailyDigest(env: Env, now = new Date()): Promise<RunRes
   const macroRows = items.filter((item) => item.kind === 'macro').map((item) => ({ item, signal: signals.find((signal) => signal.watchItemId === item.id)! }));
   const fallback = fallbackHeadline(themeRows, macroRows);
   let headline = fallback;
+  let modelLabel = '';
   try {
-    headline = await summarizeWithLLM(config, env.AI, themeRows, macroRows, fallback);
+    const llmResult = await summarizeWithLLM(config, env.AI, themeRows, macroRows, fallback);
+    headline = llmResult.headline;
+    modelLabel = llmResult.modelLabel;
   } catch {
     headline = fallback;
   }
@@ -105,8 +108,8 @@ export async function runDailyDigest(env: Env, now = new Date()): Promise<RunRes
     reportUrl = undefined;
   }
 
-  const messagePreview = buildDailyMessage(headline, themeRows, macroRows, reportUrl);
-  await pushToFeishu(config, buildDailyPostMessage(headline, themeRows, macroRows, reportUrl));
+  const messagePreview = buildDailyMessage(headline, themeRows, macroRows, reportUrl, modelLabel);
+  await pushToFeishu(config, buildDailyPostMessage(headline, themeRows, macroRows, reportUrl, modelLabel));
   await insertNotificationRun(env.WATCHER_DB!, {
     id: crypto.randomUUID(),
     tradeDate,
@@ -122,8 +125,8 @@ export async function runDailyDigest(env: Env, now = new Date()): Promise<RunRes
   for (const item of items) {
     const signal = signals.find((entry) => entry.watchItemId === item.id)!;
     if (!shouldSendExtremeAlert(state, item.id, signal.zone)) continue;
-    const text = buildExtremeAlertMessage(item, signal, reportUrl);
-    await pushToFeishu(config, buildExtremeAlertPostMessage(item, signal, reportUrl));
+    const text = buildExtremeAlertMessage(item, signal, reportUrl, modelLabel);
+    await pushToFeishu(config, buildExtremeAlertPostMessage(item, signal, reportUrl, modelLabel));
     await insertNotificationRun(env.WATCHER_DB!, {
       id: crypto.randomUUID(),
       tradeDate,
@@ -142,6 +145,7 @@ export async function runDailyDigest(env: Env, now = new Date()): Promise<RunRes
   return {
     tradeDate,
     headline,
+    modelLabel,
     reportUrl,
     messagePreview,
     alertPreviews,
@@ -206,6 +210,7 @@ export default {
           tradeDate: result.tradeDate,
           reportUrl: result.reportUrl,
           headline: result.headline,
+          modelLabel: result.modelLabel,
           messagePreview: result.messagePreview,
           alertPreviews: result.alertPreviews,
         });

@@ -57,6 +57,11 @@ export interface AppConfig {
   cosConfigured: boolean;
 }
 
+export interface LLMHeadlineResult {
+  headline: string;
+  modelLabel: string;
+}
+
 export interface SourceLeguleguIndexBasic {
   kind: 'legulegu_index_basic';
   indexCode: string;
@@ -158,6 +163,7 @@ export interface ReportRow {
 export interface RunResult {
   tradeDate: string;
   headline: string;
+  modelLabel: string;
   reportUrl?: string;
   messagePreview: string;
   alertPreviews: string[];

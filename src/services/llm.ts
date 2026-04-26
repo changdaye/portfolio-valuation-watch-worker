@@ -1,4 +1,4 @@
-import type { AppConfig, DailySignal, WatchItem } from '../types';
+import type { AppConfig, DailySignal, LLMHeadlineResult, WatchItem } from '../types';
 
 const DEFAULT_WORKERS_AI_MODEL = '@cf/meta/llama-3.2-1b-instruct';
 const OPENAI_COMPAT_REASONING_EFFORT = 'xhigh';
@@ -18,7 +18,7 @@ interface OpenAICompatResponse {
 
 const SYSTEM_PROMPT = `你是一名中文财经编辑。请根据投资组合主题板块估值与宏观价格分位，输出一句不超过40字的中文结论。不要带标题，不要列点。`;
 
-export async function summarizeWithLLM(config: AppConfig, ai: Ai | undefined, themeRows: Array<{ item: WatchItem; signal: DailySignal }>, macroRows: Array<{ item: WatchItem; signal: DailySignal }>, fallback: string): Promise<string> {
+export async function summarizeWithLLM(config: AppConfig, ai: Ai | undefined, themeRows: Array<{ item: WatchItem; signal: DailySignal }>, macroRows: Array<{ item: WatchItem; signal: DailySignal }>, fallback: string): Promise<LLMHeadlineResult> {
   const payload = [
     ...themeRows.map(({ item, signal }) => `${item.displayName}: ${signal.summaryLine}`),
     ...macroRows.map(({ item, signal }) => `${item.displayName}: ${signal.summaryLine}`),
@@ -32,7 +32,7 @@ export async function summarizeWithLLM(config: AppConfig, ai: Ai | undefined, th
     }
   }
 
-  if (!ai) return fallback;
+  if (!ai) return { headline: fallback, modelLabel: '' };
   return summarizeWithWorkersAI(
     ai,
     config.llmModel.startsWith('@cf/') ? config.llmModel : DEFAULT_WORKERS_AI_MODEL,
@@ -41,7 +41,7 @@ export async function summarizeWithLLM(config: AppConfig, ai: Ai | undefined, th
   );
 }
 
-async function summarizeWithOpenAICompatible(config: AppConfig, payload: string): Promise<string> {
+async function summarizeWithOpenAICompatible(config: AppConfig, payload: string): Promise<LLMHeadlineResult> {
   const response = await fetch(`${config.llmBaseUrl.replace(/\/+$/, '')}/chat/completions`, {
     method: 'POST',
     headers: {
@@ -72,10 +72,13 @@ async function summarizeWithOpenAICompatible(config: AppConfig, payload: string)
     ? rawContent.trim()
     : rawContent?.map((part) => part.text ?? '').join('').trim();
   if (!content) throw new Error('OpenAI-compatible response returned empty content');
-  return normalizeHeadline(content);
+  return {
+    headline: normalizeHeadline(content),
+    modelLabel: `${formatModelLabel(config.llmModel)} (${OPENAI_COMPAT_REASONING_EFFORT})`,
+  };
 }
 
-async function summarizeWithWorkersAI(ai: Ai, model: string, payload: string, fallback: string): Promise<string> {
+async function summarizeWithWorkersAI(ai: Ai, model: string, payload: string, fallback: string): Promise<LLMHeadlineResult> {
   const result = await ai.run(model, {
     messages: [
       { role: 'system', content: SYSTEM_PROMPT },
@@ -86,10 +89,40 @@ async function summarizeWithWorkersAI(ai: Ai, model: string, payload: string, fa
   }) as WorkersAIResult;
 
   const content = result.response?.trim();
-  if (!content) return fallback;
-  return normalizeHeadline(content);
+  if (!content) return { headline: fallback, modelLabel: '' };
+  return {
+    headline: normalizeHeadline(content),
+    modelLabel: formatModelLabel(model),
+  };
 }
 
 function normalizeHeadline(content: string): string {
   return content.replace(/^[#\-\d.、\s]+/, '').split('\n')[0].trim();
+}
+
+function formatModelLabel(model: string): string {
+  const trimmed = model.trim();
+  if (!trimmed) return 'Unknown';
+  const slug = trimmed.replace(/^@cf\//, '').split('/').pop() ?? trimmed;
+  return slug
+    .split('-')
+    .filter(Boolean)
+    .map((part) => {
+      const lower = part.toLowerCase();
+      if (lower === 'gpt') return 'GPT';
+      if (lower === 'llama') return 'Llama';
+      if (lower === 'qwen') return 'Qwen';
+      if (lower === 'gemma') return 'Gemma';
+      if (lower === 'glm') return 'GLM';
+      if (lower === 'mistral') return 'Mistral';
+      if (lower === 'kimi') return 'Kimi';
+      if (lower === 'deepseek') return 'DeepSeek';
+      if (lower === 'fp8') return 'FP8';
+      if (lower === 'awq') return 'AWQ';
+      if (lower === 'it') return 'IT';
+      if (/^\d+(\.\d+)?b$/i.test(part)) return part.toUpperCase();
+      if (/^\d+(\.\d+)?$/.test(part)) return part;
+      return part.charAt(0).toUpperCase() + part.slice(1);
+    })
+    .join(' ');
 }

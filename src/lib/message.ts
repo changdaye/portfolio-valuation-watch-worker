@@ -61,10 +61,11 @@ function buildPost(paragraphs: Array<Array<{ tag: 'text'; text: string } | { tag
   };
 }
 
-export function buildDailyMessage(headline: string, themeRows: Array<{ item: WatchItem; signal: DailySignal }>, macroRows: Array<{ item: WatchItem; signal: DailySignal }>, reportUrl?: string): string {
+export function buildDailyMessage(headline: string, themeRows: Array<{ item: WatchItem; signal: DailySignal }>, macroRows: Array<{ item: WatchItem; signal: DailySignal }>, reportUrl?: string, modelLabel = ''): string {
   const extremeRows = [...themeRows, ...macroRows].filter(({ signal }) => signal.zone === 'extreme_low' || signal.zone === 'extreme_high');
   const focusCodes = Array.from(new Set(extremeRows.flatMap(({ item }) => item.focusCodes)));
   const sections = [
+    ...(modelLabel ? [`🤖 模型：${modelLabel}`] : []),
     `【今日结论】\n${headline}`,
     `【极端区间】\n${extremeRows.length ? extremeRows.map(({ item, signal }) => item.kind === 'theme' ? themeLine(item, signal) : macroLine(item, signal)).join('\n') : '今日无新增极端区间项目'}`,
     `【主题板块】\n${themeRows.map(({ item, signal }) => themeLine(item, signal)).join('\n')}`,
@@ -75,10 +76,11 @@ export function buildDailyMessage(headline: string, themeRows: Array<{ item: Wat
   return sections.join('\n\n');
 }
 
-export function buildDailyPostMessage(headline: string, themeRows: Array<{ item: WatchItem; signal: DailySignal }>, macroRows: Array<{ item: WatchItem; signal: DailySignal }>, reportUrl?: string): FeishuPostMessage {
+export function buildDailyPostMessage(headline: string, themeRows: Array<{ item: WatchItem; signal: DailySignal }>, macroRows: Array<{ item: WatchItem; signal: DailySignal }>, reportUrl?: string, modelLabel = ''): FeishuPostMessage {
   const extremeRows = [...themeRows, ...macroRows].filter(({ signal }) => signal.zone === 'extreme_low' || signal.zone === 'extreme_high');
   const focusCodes = Array.from(new Set(extremeRows.flatMap(({ item }) => item.focusCodes)));
   const paragraphs: FeishuPostMessage['content']['post']['zh_cn']['content'] = [
+    ...(modelLabel ? [[{ tag: 'text', text: `🤖 模型：${modelLabel}` }] as Array<{ tag: 'text'; text: string }>] : []),
     [{ tag: 'text', text: '【今日结论】' }],
     [{ tag: 'text', text: headline }],
     [{ tag: 'text', text: '【极端区间】' }],
@@ -103,8 +105,9 @@ export function buildDailyPostMessage(headline: string, themeRows: Array<{ item:
   return buildPost(paragraphs);
 }
 
-export function buildExtremeAlertMessage(item: WatchItem, signal: DailySignal, reportUrl?: string): string {
+export function buildExtremeAlertMessage(item: WatchItem, signal: DailySignal, reportUrl?: string, modelLabel = ''): string {
   const sections = [
+    ...(modelLabel ? [`🤖 模型：${modelLabel}`] : []),
     `【${item.displayName} 进入极端区间】`,
     item.kind === 'theme' && item.sourceHoldings.length ? `关联持仓：${describeHoldings(item.sourceHoldings)}` : undefined,
     `当前状态：${zoneLabel(signal.zone)}`,
@@ -115,8 +118,9 @@ export function buildExtremeAlertMessage(item: WatchItem, signal: DailySignal, r
   return sections.join('\n\n');
 }
 
-export function buildExtremeAlertPostMessage(item: WatchItem, signal: DailySignal, reportUrl?: string): FeishuPostMessage {
+export function buildExtremeAlertPostMessage(item: WatchItem, signal: DailySignal, reportUrl?: string, modelLabel = ''): FeishuPostMessage {
   const paragraphs: FeishuPostMessage['content']['post']['zh_cn']['content'] = [
+    ...(modelLabel ? [[{ tag: 'text', text: `🤖 模型：${modelLabel}` }] as Array<{ tag: 'text'; text: string }>] : []),
     [{ tag: 'text', text: `【${item.displayName} 进入极端区间】` }],
   ];
   if (item.kind === 'theme' && item.sourceHoldings.length) {

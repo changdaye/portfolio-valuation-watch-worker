@@ -83,7 +83,7 @@ describe('summarizeWithLLM', () => {
       '本地兜底结论',
     );
 
-    expect(result).toBe('组合估值分化，整体仍偏高位。');
+    expect(result).toEqual({ headline: '组合估值分化，整体仍偏高位。', modelLabel: 'GPT 5.4 (xhigh)' });
     const body = JSON.parse(fetchMock.mock.calls[0]?.[1]?.body as string);
     expect(body.model).toBe('gpt-5.4');
     expect(body.reasoning_effort).toBe('xhigh');
@@ -102,7 +102,7 @@ describe('summarizeWithLLM', () => {
       '本地兜底结论',
     );
 
-    expect(result).toBe('组合估值虽高，短线先看分化。');
+    expect(result).toEqual({ headline: '组合估值虽高，短线先看分化。', modelLabel: 'Llama 3.2 1B Instruct' });
     expect(run).toHaveBeenCalledTimes(1);
     expect(run.mock.calls[0]?.[0]).toBe('@cf/meta/llama-3.2-1b-instruct');
   });

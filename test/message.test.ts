@@ -36,7 +36,8 @@ const signal: DailySignal = {
 
 describe('message builders', () => {
   it('keeps the preferred Feishu report footer', () => {
-    const text = buildDailyMessage('组合估值整体偏低。', [{ item, signal }], [], 'https://example.com/report.md');
+    const text = buildDailyMessage('组合估值整体偏低。', [{ item, signal }], [], 'https://example.com/report.md', 'GPT 5.4 (xhigh)');
+    expect(text).toContain('🤖 模型：GPT 5.4 (xhigh)');
     expect(text).toContain('【主题板块】');
     expect(text).toContain('港股宽基｜持仓 恒生ETF华夏');
     expect(text).toContain('关注代码');
@@ -44,7 +45,8 @@ describe('message builders', () => {
   });
 
   it('mentions the zone and reason once in alerts', () => {
-    const text = buildExtremeAlertMessage(item, signal, 'https://example.com/report.md');
+    const text = buildExtremeAlertMessage(item, signal, 'https://example.com/report.md', 'GPT 5.4 (xhigh)');
+    expect(text).toContain('🤖 模型：GPT 5.4 (xhigh)');
     expect(text).toContain('进入极端区间');
     expect(text).toContain('【港股宽基 进入极端区间】');
     expect(text).toContain('关联持仓：恒生ETF华夏(159920)');
@@ -52,11 +54,13 @@ describe('message builders', () => {
   });
 
   it('shows the full report URL in post messages without wrapping it behind custom link text', () => {
-    const dailyPost = buildDailyPostMessage('组合估值整体偏低。', [{ item, signal }], [], 'https://example.com/report.md');
-    const alertPost = buildExtremeAlertPostMessage(item, signal, 'https://example.com/report.md');
+    const dailyPost = buildDailyPostMessage('组合估值整体偏低。', [{ item, signal }], [], 'https://example.com/report.md', 'GPT 5.4 (xhigh)');
+    const alertPost = buildExtremeAlertPostMessage(item, signal, 'https://example.com/report.md', 'GPT 5.4 (xhigh)');
 
     expect(JSON.stringify(dailyPost)).toContain('https://example.com/report.md');
     expect(JSON.stringify(alertPost)).toContain('https://example.com/report.md');
+    expect(JSON.stringify(dailyPost)).toContain('🤖 模型：GPT 5.4 (xhigh)');
+    expect(JSON.stringify(alertPost)).toContain('🤖 模型：GPT 5.4 (xhigh)');
     expect(JSON.stringify(dailyPost)).not.toContain('点击查看 HTML 详细报告');
     expect(JSON.stringify(alertPost)).not.toContain('点击查看 HTML 详细报告');
   });
