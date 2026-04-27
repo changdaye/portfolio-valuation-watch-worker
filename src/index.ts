@@ -7,7 +7,6 @@ import { buildDetailedReportPublicUrl, maybeHandleDetailedReportRequest, saveDet
 import { getRuntimeState, nextRuntimeState, recordFailure, setRuntimeState, shouldSendExtremeAlert } from './lib/runtime';
 import { formatDateInZone, isoNow, weekdayInZone } from './lib/time';
 import { uploadDetailedReportToCos, uploadFeishuMessageToCos } from './services/cos';
-import { runFinalSummary } from './services/final-summary';
 import { pushToFeishu } from './services/feishu';
 import { summarizeWithLLM } from './services/llm';
 import { reconcileSignals } from './services/reconcile';
@@ -187,11 +186,6 @@ export default {
           lowThreshold: config.lowPercentileThreshold,
           highThreshold: config.highPercentileThreshold,
         },
-        finalSummary: {
-          hourLocal: config.finalSummaryHourLocal,
-          minuteLocal: config.finalSummaryMinuteLocal,
-          lookbackHours: config.finalSummaryLookbackHours,
-        },
         feishuConfigured: config.feishuConfigured,
         cosConfigured: config.cosConfigured,
       });
@@ -210,18 +204,6 @@ export default {
       if (!env.WATCHER_DB) return json({ ok: false, error: 'missing WATCHER_DB binding' }, 500);
       const inserted = await reseedDefaultWatchItems(env.WATCHER_DB, isoNow());
       return json({ ok: true, inserted });
-    }
-
-    if (request.method === 'POST' && url.pathname === '/admin/final-summary') {
-      const auth = authorizeAdminRequest(request, config.manualTriggerToken);
-      if (!auth.ok) return json({ ok: false, error: auth.error ?? 'unauthorized' }, auth.status);
-      try {
-        const result = await runFinalSummary(env, config);
-        return json({ ok: true, summary: result });
-      } catch (error) {
-        const detail = error instanceof Error ? error.message : String(error);
-        return json({ ok: false, error: detail }, 500);
-      }
     }
 
     if (request.method === 'POST' && url.pathname === '/admin/trigger') {
@@ -255,19 +237,7 @@ export default {
     if (!env.WATCHER_DB || !env.RUNTIME_KV) return;
     const config = parseConfig(env);
     const now = new Date();
-    const localWeekday = weekdayInZone(now, config.marketTimezone);
-    const localDate = formatDateInZone(now, config.marketTimezone);
-    const [hourPart, minutePart] = new Intl.DateTimeFormat('en-GB', { timeZone: config.marketTimezone, hour: '2-digit', minute: '2-digit', hour12: false }).format(now).split(':');
-    const localHour = Number(hourPart);
-    const localMinute = Number(minutePart);
-
-    if (config.runWeekdays.includes(localWeekday) && localHour == config.runHourLocal && localMinute == config.runMinuteLocal) {
-      await runDailyDigest(env, now);
-      return;
-    }
-
-    if (localHour == config.finalSummaryHourLocal && localMinute == config.finalSummaryMinuteLocal) {
-      await runFinalSummary(env, config, now);
-    }
+    if (!config.runWeekdays.includes(weekdayInZone(now, config.marketTimezone))) return;
+    await runDailyDigest(env, now);
   },
 };

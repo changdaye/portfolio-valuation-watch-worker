@@ -43,9 +43,6 @@ export function buildFeishuMessageObjectKey(now = new Date()): string {
   return `${PREFIX}/feishu-messages/${utcStamp(now)}.txt`;
 }
 
-export function buildFinalSummaryObjectKey(now = new Date()): string {
-  return `${PREFIX}/final-summaries/${utcStamp(now)}.txt`;
-}
 
 function themeRow(item: WatchItem, signal: DailySignal): string {
   return `<tr><td>${escapeHtml(item.displayName)}</td><td>${escapeHtml(describeHoldings(item.sourceHoldings))}</td><td>${escapeHtml(signal.asOfDate)}</td><td>${formatDisplayNumber(signal.pe, 2, '-')}</td><td>${formatDisplayPercent(signal.pePct5y, 2, '-')}%</td><td>${formatDisplayNumber(signal.pb, 2, '-')}</td><td>${formatDisplayPercent(signal.pbPct5y, 2, '-')}%</td><td>${escapeHtml(zoneLabel(signal.zone))}</td><td>${escapeHtml(item.note ?? '-')}</td></tr>`;

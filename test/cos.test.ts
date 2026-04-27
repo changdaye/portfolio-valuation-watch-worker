@@ -25,9 +25,6 @@ function makeConfig(): AppConfig {
     requestTimeoutMs: 15000,
     heartbeatIntervalHours: 24,
     llmModel: 'gpt-5.4',
-    finalSummaryHourLocal: 0,
-    finalSummaryMinuteLocal: 30,
-    finalSummaryLookbackHours: 24,
     feishuConfigured: true,
     cosConfigured: true,
   };

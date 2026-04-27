@@ -14,8 +14,5 @@ describe('parseConfig', () => {
     expect(config.workerPublicBaseUrl).toBe('https://portfolio-valuation-watch-worker.wanggejiancai822.workers.dev');
     expect(config.llmBaseUrl).toBe('');
     expect(config.llmApiKey).toBe('');
-    expect(config.finalSummaryHourLocal).toBe(0);
-    expect(config.finalSummaryMinuteLocal).toBe(30);
-    expect(config.finalSummaryLookbackHours).toBe(24);
   });
 });

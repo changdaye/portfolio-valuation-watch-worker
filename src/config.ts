@@ -41,9 +41,6 @@ export function parseConfig(env: Partial<Env>): AppConfig {
     requestTimeoutMs: toInt(env.REQUEST_TIMEOUT_MS, 15000, 1000),
     heartbeatIntervalHours: toInt(env.HEARTBEAT_INTERVAL_HOURS, 24, 1),
     llmModel: env.LLM_MODEL?.trim() || '@cf/meta/llama-3.1-8b-instruct',
-    finalSummaryHourLocal: toInt(env.FINAL_SUMMARY_HOUR_LOCAL, 0, 0),
-    finalSummaryMinuteLocal: toInt(env.FINAL_SUMMARY_MINUTE_LOCAL, 30, 0),
-    finalSummaryLookbackHours: toInt(env.FINAL_SUMMARY_LOOKBACK_HOURS, 24, 1),
     feishuConfigured: Boolean(env.FEISHU_WEBHOOK?.trim() && env.FEISHU_SECRET?.trim()),
     cosConfigured,
   };

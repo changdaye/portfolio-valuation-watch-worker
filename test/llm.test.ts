@@ -25,9 +25,6 @@ function makeConfig(): AppConfig {
     requestTimeoutMs: 15000,
     heartbeatIntervalHours: 24,
     llmModel: '@cf/meta/llama-3.1-8b-instruct',
-    finalSummaryHourLocal: 0,
-    finalSummaryMinuteLocal: 30,
-    finalSummaryLookbackHours: 24,
     feishuConfigured: true,
     cosConfigured: true,
   };

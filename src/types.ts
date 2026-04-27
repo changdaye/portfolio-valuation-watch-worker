@@ -29,9 +29,6 @@ export interface Env {
   REQUEST_TIMEOUT_MS?: string;
   HEARTBEAT_INTERVAL_HOURS?: string;
   LLM_MODEL?: string;
-  FINAL_SUMMARY_HOUR_LOCAL?: string;
-  FINAL_SUMMARY_MINUTE_LOCAL?: string;
-  FINAL_SUMMARY_LOOKBACK_HOURS?: string;
 }
 
 
@@ -57,9 +54,6 @@ export interface AppConfig {
   requestTimeoutMs: number;
   heartbeatIntervalHours: number;
   llmModel: string;
-  finalSummaryHourLocal: number;
-  finalSummaryMinuteLocal: number;
-  finalSummaryLookbackHours: number;
   feishuConfigured: boolean;
   cosConfigured: boolean;
 }
