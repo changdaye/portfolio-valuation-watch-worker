@@ -1,5 +1,6 @@
 import type { AppConfig, Env } from '../types';
 import { fetchCosObjectText, listCosObjects, uploadFinalSummaryToCos } from './cos';
+import { pushToFeishu } from './feishu';
 
 interface FinalSummaryResult {
   key: string;
@@ -106,5 +107,7 @@ export async function runFinalSummary(env: Env, config: AppConfig, now = new Dat
   ].filter(Boolean).join('\n');
 
   const uploaded = await uploadFinalSummaryToCos(config, header, now);
-  return { key: uploaded.key, url: uploaded.url, content: header, includedCount: messages.length, modelLabel: llm.modelLabel };
+  const contentWithLink = `${header}\n\n详细版存档:\n${uploaded.url}`;
+  await pushToFeishu(config, { msg_type: 'text', content: { text: contentWithLink } });
+  return { key: uploaded.key, url: uploaded.url, content: contentWithLink, includedCount: messages.length, modelLabel: llm.modelLabel };
 }

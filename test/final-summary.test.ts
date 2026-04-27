@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { runFinalSummary } from '../src/services/final-summary';
 import type { AppConfig } from '../src/types';
 import * as cos from '../src/services/cos';
+import * as feishu from '../src/services/feishu';
 
 function makeConfig(): AppConfig {
   return {
@@ -48,10 +49,14 @@ describe('runFinalSummary', () => {
       url: 'https://bucket.cos.ap-shanghai.myqcloud.com/portfolio-valuation-watch-worker/final-summaries/20260428003000.txt',
     });
 
+    const pushSpy = vi.spyOn(feishu, 'pushToFeishu').mockResolvedValue();
+
     const result = await runFinalSummary({ AI: { run: vi.fn().mockResolvedValue({ response: '【凌晨总结】\n\n【核心脉络】\n两条消息偏低位。\n\n【主要风险】\n波动仍大。' }) } as any } as any, makeConfig(), new Date('2026-04-28T00:30:00.000Z'));
 
     expect(result?.includedCount).toBe(2);
     expect(result?.key).toContain('final-summaries/20260428003000.txt');
     expect(result?.content).toContain('【凌晨总结】');
+    expect(result?.content).toContain('详细版存档:');
+    expect(pushSpy).toHaveBeenCalledTimes(1);
   });
 });
