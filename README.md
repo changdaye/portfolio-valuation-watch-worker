@@ -10,6 +10,8 @@
 - 估值 / 价格统一按**近 5 年分位**观察
 - 进入 **10% / 90% 极端区间**时额外提醒
 - 详细版 HTML 报告上传腾讯云 COS，可在浏览器直接打开
+- 每次飞书短消息也会额外存档到 `portfolio-valuation-watch-worker/feishu-messages/YYYYMMDDHHMMSS.txt`
+- 每天凌晨 00:30（Asia/Shanghai）读取最近 24 小时飞书消息，生成并存档 `portfolio-valuation-watch-worker/final-summaries/YYYYMMDDHHMMSS.txt`
 - `/admin/trigger` 返回 `messagePreview`，便于部署后核对飞书消息样式
 
 ## 已确认范围
@@ -61,6 +63,14 @@ curl -X POST \
   "messagePreview": "...",
   "alertPreviews": []
 }
+```
+
+### 手动触发凌晨总结
+
+```bash
+curl -X POST \
+  -H "Authorization: Bearer YOUR_MANUAL_TRIGGER_TOKEN" \
+  https://<your-worker>/admin/final-summary
 ```
 
 ### 查看当前观察对象

@@ -24,8 +24,8 @@ function escapeHtml(value: string): string {
     .replace(/'/g, '&#39;');
 }
 
-export function buildDetailedReportObjectKey(now = new Date()): string {
-  const stamp = [
+function utcStamp(now = new Date()): string {
+  return [
     now.getUTCFullYear(),
     String(now.getUTCMonth() + 1).padStart(2, '0'),
     String(now.getUTCDate()).padStart(2, '0'),
@@ -33,7 +33,18 @@ export function buildDetailedReportObjectKey(now = new Date()): string {
     String(now.getUTCMinutes()).padStart(2, '0'),
     String(now.getUTCSeconds()).padStart(2, '0'),
   ].join('');
-  return `${PREFIX}/${stamp}.html`;
+}
+
+export function buildDetailedReportObjectKey(now = new Date()): string {
+  return `${PREFIX}/${utcStamp(now)}.html`;
+}
+
+export function buildFeishuMessageObjectKey(now = new Date()): string {
+  return `${PREFIX}/feishu-messages/${utcStamp(now)}.txt`;
+}
+
+export function buildFinalSummaryObjectKey(now = new Date()): string {
+  return `${PREFIX}/final-summaries/${utcStamp(now)}.txt`;
 }
 
 function themeRow(item: WatchItem, signal: DailySignal): string {

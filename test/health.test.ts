@@ -9,5 +9,6 @@ describe('worker health', () => {
     expect(payload.ok).toBe(true);
     expect(payload.status).toBe('bootstrap');
     expect(payload).toHaveProperty('schedule');
+    expect(payload).toHaveProperty('finalSummary');
   });
 });

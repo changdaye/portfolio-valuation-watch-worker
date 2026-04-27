@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildDetailedReport } from '../src/lib/report';
+import { buildDetailedReport, buildFeishuMessageObjectKey, buildFinalSummaryObjectKey } from '../src/lib/report';
 import type { DailySignal, WatchItem } from '../src/types';
 
 describe('buildDetailedReport', () => {
@@ -50,5 +50,18 @@ describe('buildDetailedReport', () => {
     expect(report).toContain('关联持仓');
     expect(report).toContain('<table>');
     expect(report).toContain('2026-04-25');
+  });
+});
+
+
+describe('buildFeishuMessageObjectKey', () => {
+  it('stores feishu messages under the dedicated directory', () => {
+    expect(buildFeishuMessageObjectKey(new Date('2026-04-27T08:00:55.625Z'))).toBe('portfolio-valuation-watch-worker/feishu-messages/20260427080055.txt');
+  });
+});
+
+describe('buildFinalSummaryObjectKey', () => {
+  it('stores final summaries under the dedicated directory', () => {
+    expect(buildFinalSummaryObjectKey(new Date('2026-04-28T00:30:00.000Z'))).toBe('portfolio-valuation-watch-worker/final-summaries/20260428003000.txt');
   });
 });
