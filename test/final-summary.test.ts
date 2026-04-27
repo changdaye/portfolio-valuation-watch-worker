@@ -56,7 +56,10 @@ describe('runFinalSummary', () => {
     expect(result?.includedCount).toBe(2);
     expect(result?.key).toContain('final-summaries/20260428003000.txt');
     expect(result?.content).toContain('【凌晨总结】');
-    expect(result?.content).toContain('详细版存档:');
+    expect(result?.content).not.toContain('详细版存档:');
     expect(pushSpy).toHaveBeenCalledTimes(1);
+    const pushed = pushSpy.mock.calls[0]?.[1] as any;
+    expect(pushed.content.text).toContain('【凌晨总结已生成】');
+    expect(pushed.content.text).toContain('详细版存档:');
   });
 });

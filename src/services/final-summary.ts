@@ -107,7 +107,14 @@ export async function runFinalSummary(env: Env, config: AppConfig, now = new Dat
   ].filter(Boolean).join('\n');
 
   const uploaded = await uploadFinalSummaryToCos(config, header, now);
-  const contentWithLink = `${header}\n\n详细版存档:\n${uploaded.url}`;
-  await pushToFeishu(config, { msg_type: 'text', content: { text: contentWithLink } });
-  return { key: uploaded.key, url: uploaded.url, content: contentWithLink, includedCount: messages.length, modelLabel: llm.modelLabel };
+  const feishuText = [
+    '【凌晨总结已生成】',
+    `纳入消息数：${messages.length}`,
+    llm.modelLabel ? `模型：${llm.modelLabel}` : undefined,
+    '',
+    '详细版存档:',
+    uploaded.url,
+  ].filter(Boolean).join('\n');
+  await pushToFeishu(config, { msg_type: 'text', content: { text: feishuText } });
+  return { key: uploaded.key, url: uploaded.url, content: header, includedCount: messages.length, modelLabel: llm.modelLabel };
 }
